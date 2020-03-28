@@ -1,14 +1,17 @@
 package student;
 
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.sql.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.BorderLayout;
 
-class CourseInfo extends JPanel implements ActionListener,Listener {
-	// 课程信息管理
+class StudentInfo extends JPanel implements ActionListener,Listener {// 学生信息管理
+	
 	JPanel panel = new JPanel();
 	JButton btnAdd = new JButton("增加");
 	JButton btnDelete = new JButton("删除");
@@ -21,10 +24,10 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 	Statement stmt = null;
 	ResultSet rs = null;
 	Object[][] columnValues;
-	String [] columnNames;
+	String[] columnNames;
 	DefaultTableModel tableModel;
-
-	CourseInfo() {// 构造方法
+	
+	StudentInfo() {// 构造方法
 		setLayout(new BorderLayout(0, 0));
 		add(panel, BorderLayout.NORTH);
 		panel.add(btnAdd);
@@ -37,46 +40,46 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		btnAlter.addActionListener(this);
 		btnSearch.addActionListener(this);
 		btnDisplay.addActionListener(this);
-		columnNames=new String []{"课程号","课程名","学分","专业","任课教师"};
-		getAllCourses();
-		tableModel=new DefaultTableModel(columnValues,columnNames);
-		table=new JTable(tableModel);
-		scroll=new JScrollPane(table);
+		columnNames=new String []{ "学号", "姓名", "性别", "年龄", "专业" };
+		getAllStudents();
+		tableModel = new DefaultTableModel(columnValues,columnNames);
+		table = new JTable(tableModel);
+		scroll = new JScrollPane(table);
 		add(scroll);
 	}
 	
-	//获取课程列表
-	public void getAllCourses(){
-		int count=0,index=0;
-		connDB();// 连接数据库
-		try{
-			rs=stmt.executeQuery("select count(*) from su");
+	//获取学生列表
+	public void getAllStudents(){
+		int count = 0,index=0;
+		connDB(); // 连接数据库	
+		try {
+			rs = stmt.executeQuery("select count(*) from s");
 			rs.next();
 			count=rs.getInt(1);
-		}catch(SQLException e){
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		columnValues=new Object[count][5];
-		try{
-			rs=stmt.executeQuery("select * from su order by 学号");
-			while(rs.next()){
-				columnValues[index][0]=rs.getString("学号");
-				columnValues[index][1]=rs.getString("姓名");
-				columnValues[index][2]=rs.getInt("填报时间");
-				columnValues[index][3]=rs.getString("所在地");
-				columnValues[index][4]=rs.getString("当前健康状况");
+		columnValues = new Object[count][5];
+		try {
+			rs = stmt.executeQuery("select * from s order by 学号");
+			while (rs.next()) {
+				columnValues[index][0] = rs.getString("学号");
+				columnValues[index][1] = rs.getString("姓名");
+				columnValues[index][2] = rs.getString("性别");
+				columnValues[index][3] = rs.getInt("年龄");
+				columnValues[index][4] = rs.getString("专业");
 				index++;
 			}
-		}catch(SQLException e){
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		closeDB();
 	}
 
-	//刷新课程列表
-	public void refresh(){
-		getAllCourses();
-		tableModel.setDataVector(columnValues, columnNames);
+	//刷新学生列表
+	public void refresh() {
+		getAllStudents();
+	    tableModel.setDataVector(columnValues, columnNames);
 		tableModel.fireTableDataChanged();
 	}
 
@@ -96,7 +99,7 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		}
 	}
 
-	public void closeDB() // 关闭连接
+	public void closeDB() // 关闭数据库连接
 	{
 		try {
 			stmt.close();
@@ -106,7 +109,7 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		}
 	}
 
-	// 删除某个课程信息
+	// 删除某个学生的基本信息
 	public void delete() {
 		int row = -1;
 		row = table.getSelectedRow();
@@ -114,42 +117,40 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		if (row == -1) {// 判断要删除的信息是否被选中
 			JOptionPane.showMessageDialog(null, "请选择要删除的记录！");
 		} else {
-			String cno=columnValues[row][0].toString();
-			try{
-				stmt.executeUpdate("delete from sc where cno='"+cno+"'");   //删除选课表中的记录
-				stmt.executeUpdate("delete from c where cno='"+cno+"'");    //删除开课表中的记录
+			String sno=columnValues[row][0].toString();
+			try {
+				stmt.executeUpdate("delete from sc where sno='"+sno+"'");   //删除选课表中的记录
+				stmt.executeUpdate("delete from s where sno='"+sno+"'");    //删除学生表中的记录
 				JOptionPane.showMessageDialog(null, "记录删除成功！");
 				refresh();
-			}catch (SQLException e) {
+			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		closeDB();
 	}
 
-	// 修改某个课程记录
+	// 修改某个学生的基本信息
 	public void update() {
 		int row = -1;
 		row = table.getSelectedRow();
-		connDB();
 		if (row == -1) {
 			JOptionPane.showMessageDialog(null, "请选择要修改的记录！");
 		} else {
-			CourseAdd cadd=new CourseAdd(this);
-			cadd.setTitle("修改");
-			cadd.t学号.setText(columnValues[row][0].toString());
-			cadd.t姓名.setText(columnValues[row][1].toString());
-			cadd.t填报时间.setText(columnValues[row][2].toString());
-			cadd.t所在地.setText(columnValues[row][3].toString());
-			cadd.t当前健康状况.setText(columnValues[row][4].toString());
-			cadd.t学号.setEnabled(false);
+			StudentAdd sadd = new StudentAdd(this);
+			sadd.setTitle("修改");
+			sadd.tsno.setText(columnValues[row][0].toString());
+			sadd.tsname.setText(columnValues[row][1].toString());
+			sadd.cbssex.setSelectedItem(columnValues[row][2].toString());
+			sadd.tsage.setText(columnValues[row][3].toString());
+			sadd.cbsdept.setSelectedItem(columnValues[row][4].toString());
+			sadd.tsno.setEnabled(false);
 		}
-		closeDB();
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand() == "增加") {
-			new CourseAdd(this);
+			new StudentAdd(this);
 		}
 		if (e.getActionCommand() == "删除") {
 			delete();
@@ -164,24 +165,19 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 			refresh();
 		}
 	}
-	
-	@Override
-	public void refreshUI() {
-		refresh();
-	}
 
 	@Override
 	public void getMessage(String message) {
-		connDB();
 		columnValues = new Object[1][5];
+		connDB();
 		try {
-			rs = stmt.executeQuery("select * from su where 学号='" +message+ "'");
+			rs = stmt.executeQuery("select * from s where 学号='" +message+ "'");
 			rs.next();
 			columnValues[0][0] = rs.getString("学号");
 			columnValues[0][1] = rs.getString("姓名");
-			columnValues[0][2] = rs.getInt("填报时间");
-			columnValues[0][3] = rs.getString("所在地");
-			columnValues[0][4] = rs.getString("当前健康状况");
+			columnValues[0][2] = rs.getString("性别");
+			columnValues[0][3] = rs.getInt("年龄");
+			columnValues[0][4] = rs.getString("专业");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -195,5 +191,8 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		closeDB();
 	}
 
+	@Override
+	public void refreshUI() {
+		refresh();
+	}
 }
-

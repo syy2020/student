@@ -7,8 +7,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 
-class CourseInfo extends JPanel implements ActionListener,Listener {
-	// 课程信息管理
+class esInfo extends JPanel implements ActionListener,Listener {// 课程信息管理
+	
 	JPanel panel = new JPanel();
 	JButton btnAdd = new JButton("增加");
 	JButton btnDelete = new JButton("删除");
@@ -24,7 +24,7 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 	String [] columnNames;
 	DefaultTableModel tableModel;
 
-	CourseInfo() {// 构造方法
+	esInfo() {// 构造方法
 		setLayout(new BorderLayout(0, 0));
 		add(panel, BorderLayout.NORTH);
 		panel.add(btnAdd);
@@ -37,7 +37,7 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		btnAlter.addActionListener(this);
 		btnSearch.addActionListener(this);
 		btnDisplay.addActionListener(this);
-		columnNames=new String []{"课程号","课程名","学分","专业","任课教师"};
+		columnNames=new String []{"学号","姓名","填报时间","所在地","当前健康状况"};
 		getAllCourses();
 		tableModel=new DefaultTableModel(columnValues,columnNames);
 		table=new JTable(tableModel);
@@ -116,8 +116,8 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		} else {
 			String cno=columnValues[row][0].toString();
 			try{
-				stmt.executeUpdate("delete from sc where cno='"+cno+"'");   //删除选课表中的记录
-				stmt.executeUpdate("delete from c where cno='"+cno+"'");    //删除开课表中的记录
+				stmt.executeUpdate("delete from su where 学号='"+cno+"'");   //删除选课表中的记录
+				stmt.executeUpdate("delete from su where cno='"+cno+"'");    //删除开课表中的记录
 				JOptionPane.showMessageDialog(null, "记录删除成功！");
 				refresh();
 			}catch (SQLException e) {
@@ -135,7 +135,7 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 		if (row == -1) {
 			JOptionPane.showMessageDialog(null, "请选择要修改的记录！");
 		} else {
-			CourseAdd cadd=new CourseAdd(this);
+			esAdd cadd=new esAdd(this);
 			cadd.setTitle("修改");
 			cadd.t学号.setText(columnValues[row][0].toString());
 			cadd.t姓名.setText(columnValues[row][1].toString());
@@ -149,7 +149,7 @@ class CourseInfo extends JPanel implements ActionListener,Listener {
 	
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand() == "增加") {
-			new CourseAdd(this);
+			new esAdd(this);
 		}
 		if (e.getActionCommand() == "删除") {
 			delete();

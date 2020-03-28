@@ -7,8 +7,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 
-class CourseInfo extends JPanel implements ActionListener,Listener {// 课程信息管理
-	
+class CourseInfo extends JPanel implements ActionListener,Listener {
+	// 课程信息管理
 	JPanel panel = new JPanel();
 	JButton btnAdd = new JButton("增加");
 	JButton btnDelete = new JButton("删除");
